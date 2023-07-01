@@ -147,7 +147,7 @@ const HomePage = () => {
                         </div>
                     </div>
                 ) : (
-                    <div>the category isn't selected, please choose one</div>
+                    <div>the category isn&apost selected, please choose one</div>
                 )}
             </div>
         </div>

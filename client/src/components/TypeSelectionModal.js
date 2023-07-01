@@ -2,7 +2,9 @@ import React from 'react';
 import ReactModal from 'react-modal';
 import {categories} from "@/constants";
 
-export const TypeSelectionModal = ({ isOpen, onClose, setCategory }) => {
+export const TypeSelectionModal = ({ isOpen, onClose, setCategory ,toggleSortByDate ,sortByDate}) => {
+
+
     const handleCategorySelect = (type) => {
         onClose();
         setCategory(type);
@@ -36,6 +38,12 @@ export const TypeSelectionModal = ({ isOpen, onClose, setCategory }) => {
                         {category}
                     </button>
                 ))}
+                <br/>
+                <label>
+                    <input type="checkbox" onClick={toggleSortByDate} checked={sortByDate}/>
+                        <span> sort by date</span>
+                </label>
+
             </div>
         </ReactModal>
     );

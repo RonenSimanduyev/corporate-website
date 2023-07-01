@@ -10,7 +10,12 @@ const HomePage = () => {
     const [category, setCategory] = useState(categories[0]);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedImage, setSelectedImage] = useState(null);
+    const [sortByDate ,setSortByDate] =useState(false)
 
+
+    const toggleSortByDate=()=>{
+        setSortByDate(!sortByDate)
+    }
     const handleModalOpen = () => {
         setIsModalOpen(true);
     };
@@ -34,7 +39,7 @@ const HomePage = () => {
     useEffect(() => {
             const fetchData = async () => {
                 const response = await fetch(
-                    `http://localhost:4000/photos?category=${category}`
+                    `http://localhost:4000/photos?category=${category}&sortByDate=${sortByDate ? 'true' : ''}`
                 );
                 const data = await response.json();
                 dispatch({ type: 'FETCH_PHOTOS', payload: data });
@@ -42,7 +47,7 @@ const HomePage = () => {
             };
 
             fetchData();
-    }, [category,dispatch]);
+    }, [category,dispatch,sortByDate]);
 
 
     return (
@@ -60,6 +65,8 @@ const HomePage = () => {
                 onClose={handleModalClose}
                 onSelectType={handleCategorySelect}
                 setCategory={setCategory}
+                toggleSortByDate={toggleSortByDate}
+                sortByDate={sortByDate}
             />
 
             <div className="text-white text-4xl text-center mt-8 mb-4">

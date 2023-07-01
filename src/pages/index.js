@@ -1,6 +1,7 @@
 import {useEffect, useState} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import ReactModal from 'react-modal';
+import { TypeSelectionModal } from '../components/TypeSelectionModal';
 
 
 
@@ -8,6 +9,7 @@ const HomePage = () => {
     const [currentPage , setCurrentPage] =useState(1)
     const [category , setCategory] =useState('')
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedType, setSelectedType] = useState('');
 
     const handleModalOpen = () => {
         setIsModalOpen(true);
@@ -16,13 +18,35 @@ const HomePage = () => {
     const handleModalClose = () => {
         setIsModalOpen(false);
     };
-    const handlePrev = () => {
-        // Logic to fetch and update previous 9 items
+
+    const handleTypeSelect = (type) => {
+        setSelectedType(type);
+        handleModalClose();
+        // Call server API or update state based on the selected type
+        // You can add your logic here to fetch new data based on the selected type
+    };
+    const handlePrev = async () => {
+        if (currentPage > 1) {
+            const newPage = currentPage - 1;
+            const response = await fetch(
+                `https://pixabay.com/api/?key=25540812-faf2b76d586c1787d2dd02736&q=${category}&page=${newPage}`
+            );
+            const data = await response.json();
+            dispatch({ type: 'FETCH_PHOTOS', payload: data.hits.slice(0, 9) });
+            setCurrentPage(newPage);
+        }
     };
 
-    const handleNext = () => {
-        // Logic to fetch and update next 9 items
+    const handleNext = async () => {
+        const newPage = currentPage + 1;
+        const response = await fetch(
+            `https://pixabay.com/api/?key=25540812-faf2b76d586c1787d2dd02736&q=${category}&page=${newPage}`
+        );
+        const data = await response.json();
+        dispatch({ type: 'FETCH_PHOTOS', payload: data.hits.slice(0, 9) });
+        setCurrentPage(newPage);
     };
+
 
     const dispatch = useDispatch();
     const photos = useSelector((state) => state.photos.photos);
@@ -30,35 +54,51 @@ const HomePage = () => {
     useEffect(() => {
         const fetchData = async () => {
             const response = await fetch(
-                `https://pixabay.com/api/?key=25540812-faf2b76d586c1787d2dd02736&q=spo`
+                `https://pixabay.com/api/?key=25540812-faf2b76d586c1787d2dd02736&q=${category}`
             );
             const data = await response.json();
             dispatch({ type: 'FETCH_PHOTOS', payload: data.hits.slice(0, 9) });
         };
 
         fetchData();
-    }, []);
-
+    }, [category]);
     return (
         <div>
+            <div className="items-center justify-center text-center">
+                <button className="items-center justify-center text-4xl m-2 rounded-2xl w-30 p-3 bg-[#ff9900]" onClick={handleModalOpen}>Select Category</button>
+            </div>
+            <TypeSelectionModal isOpen={isModalOpen} onClose={handleModalClose} onSelectType={handleTypeSelect} setCategory={setCategory} />
+
+            <div className="text-white text-4xl text-center mt-8 mb-4">
+                {category ? (
+                        <div>
+                            <h1>Category - {category}</h1>
+
+                            <div className="grid grid-cols-3 gap-4">
+                                {photos.map((photo) => (
+                                    <div key={photo.id} className="m-5 flex items-center justify-center">
+                                        <img className="max-w-full max-h-full" src={photo.largeImageURL} alt={photo.title} />
+                                    </div>
+                                ))}
+                            </div>
+                            <div className="h-[180px] text-center sticky">
+                                <button className="items-center justify-center text-4xl m-2 rounded-2xl p-3 bg-[#ff9900]" onClick={handlePrev}>
+                                    prev
+                                </button>
+                                <span className="items-center justify-center text-4xl m-2 rounded-2xl py-3 px-5 bg-[#ff9900]">{currentPage}</span>
+                                <button className="items-center justify-center text-4xl m-2 rounded-2xl p-3 bg-[#ff9900]" onClick={handleNext}>
+                                    next
+                                </button>
+                            </div>
+                        </div>
+
+                ) : (
+                    <div>the category isn't selected, please choose one</div>
+                )}
+            </div>
 
 
-            <div className="grid grid-cols-3 gap-4">
-                {photos.map((photo) => (
-                    <div key={photo.id} className="m-5 flex items-center justify-center">
-                        <img className="max-w-full max-h-full" src={photo.largeImageURL} alt={photo.title} />
-                    </div>
-                ))}
-            </div>
-            <div className="h-[180px] text-center sticky">
-                <button className=" items-center justify-center text-4xl m-2 rounded-2xl p-3 bg-[#ff9900]" onClick={handlePrev}>
-                    prev
-                </button>
-                <span className=" items-center justify-center text-4xl m-2 rounded-2xl py-3 px-5 bg-[#ff9900]">{currentPage}</span>
-                <button className=" items-center justify-center text-4xl m-2 rounded-2xl p-3 bg-[#ff9900]" onClick={handleNext}>
-                    next
-                </button>
-            </div>
+
         </div>
     );
 };

@@ -2,15 +2,14 @@ import {useDispatch} from "react-redux";
 
 export const Pagination =({currentPage ,setCurrentPage,category})=>{
     const dispatch = useDispatch();
-
     const handlePrev = async () => {
         if (currentPage > 1) {
             const newPage = currentPage - 1;
             const response = await fetch(
-                `https://pixabay.com/api/?key=25540812-faf2b76d586c1787d2dd02736&q=${category}&page=${newPage}`
+                `http://localhost:4000/photos?category=${category}&page=${newPage}`
             );
             const data = await response.json();
-            dispatch({ type: 'FETCH_PHOTOS', payload: data.hits.slice(0, 9) });
+            dispatch({ type: 'FETCH_PHOTOS', payload: data});
             setCurrentPage(newPage);
         }
     };
@@ -18,10 +17,10 @@ export const Pagination =({currentPage ,setCurrentPage,category})=>{
     const handleNext = async () => {
         const newPage = currentPage + 1;
         const response = await fetch(
-            `https://pixabay.com/api/?key=25540812-faf2b76d586c1787d2dd02736&q=${category}&page=${newPage}`
+            `http://localhost:4000/photos?category=${category}&page=${newPage}`
         );
         const data = await response.json();
-        dispatch({ type: 'FETCH_PHOTOS', payload: data.hits.slice(0, 9) });
+        dispatch({ type: 'FETCH_PHOTOS', payload: data});
         setCurrentPage(newPage);
     };
     return    (

@@ -34,10 +34,10 @@ const HomePage = () => {
     useEffect(() => {
             const fetchData = async () => {
                 const response = await fetch(
-                    `https://pixabay.com/api/?key=25540812-faf2b76d586c1787d2dd02736&q=${category}`
+                    `http://localhost:4000/photos?category=${category}`
                 );
                 const data = await response.json();
-                dispatch({ type: 'FETCH_PHOTOS', payload: data.hits.slice(0, 9) });
+                dispatch({ type: 'FETCH_PHOTOS', payload: data });
                 setCurrentPage(1)
             };
 

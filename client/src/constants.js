@@ -1,0 +1,1 @@
+export const categories=['animals', 'vacation', 'work']

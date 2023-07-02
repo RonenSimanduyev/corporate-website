@@ -2,20 +2,23 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import ReactModal from 'react-modal';
 import { TypeSelectionModal } from '@/components/TypeSelectionModal';
-import {Pagination} from "@/components/Pagination";
-import {categories} from "@/constants";
+import { Pagination } from '@/components/Pagination';
+import { categories } from '@/constants';
+import { setSortByDate } from '@/store/reducers/filtersSlice';
+import { setCurrentPage } from '@/store/reducers/filtersSlice';
+
 
 const HomePage = () => {
-    const [currentPage, setCurrentPage] = useState(1);
-    const [category, setCategory] = useState(categories[0]);
+    const dispatch = useDispatch();
+
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedImage, setSelectedImage] = useState(null);
-    const [sortByDate ,setSortByDate] =useState(false)
+    const { category, sortByDate, currentPage } = useSelector((state) => state.filters);
 
+    const toggleSortByDate = () => {
+        dispatch(setSortByDate(!sortByDate));
+    };
 
-    const toggleSortByDate=()=>{
-        setSortByDate(!sortByDate)
-    }
     const handleModalOpen = () => {
         setIsModalOpen(true);
     };
@@ -28,8 +31,6 @@ const HomePage = () => {
         handleModalClose();
     };
 
-
-    const dispatch = useDispatch();
     const photos = useSelector((state) => state.photos);
 
     const handleImageSelect = (image) => {
@@ -37,18 +38,18 @@ const HomePage = () => {
     };
 
     useEffect(() => {
-            const fetchData = async () => {
-                const response = await fetch(
-                    `http://localhost:4000/photos?category=${category}&sortByDate=${sortByDate ? 'true' : ''}`
-                );
-                const data = await response.json();
-                dispatch({ type: 'FETCH_PHOTOS', payload: data });
-                setCurrentPage(1)
-            };
+        const fetchData = async () => {
+            const response = await fetch(
+                `http://localhost:4000/photos?category=${category}&sortByDate=${sortByDate ? 'true' : ''}`
+            );
+            const data = await response.json();
+            dispatch({ type: 'FETCH_PHOTOS', payload: data });
+            dispatch(setCurrentPage(1));
+        };
 
-            fetchData();
-    }, [category,dispatch,sortByDate]);
 
+        fetchData();
+    }, [category, dispatch, sortByDate]);
 
     return (
         <div>
@@ -63,32 +64,27 @@ const HomePage = () => {
             <TypeSelectionModal
                 isOpen={isModalOpen}
                 onClose={handleModalClose}
-                onSelectType={handleCategorySelect}
-                setCategory={setCategory}
+                onSelectCategory={handleCategorySelect}
                 toggleSortByDate={toggleSortByDate}
-                sortByDate={sortByDate}
             />
 
             <div className="text-white text-4xl text-center mt-8 mb-4">
-                    <div>
-                        <h1>Category - {category}</h1>
+                <div>
+                    <h1>Category - {category}</h1>
 
-                        <div className="grid grid-cols-3 gap-4">
-                            {photos.map((photo) => (
-                                <div
-                                    key={photo.id}
-                                    className="m-5 flex items-center justify-center"
-                                >
-                                    <img
-                                        className="max-w-full max-h-full cursor-pointer"
-                                        src={photo.largeImageURL}
-                                        alt={photo.title}
-                                        onClick={() => handleImageSelect(photo)}
-                                    />
-                                </div>
-                            ))}
-                        </div>
-                        <Pagination currentPage={currentPage} setCurrentPage={setCurrentPage} category={category}/>
+                    <div className="grid grid-cols-3 gap-4">
+                        {photos.map((photo) => (
+                            <div key={photo.id} className="m-5 flex items-center justify-center">
+                                <img
+                                    className="max-w-full max-h-full cursor-pointer"
+                                    src={photo.largeImageURL}
+                                    alt={photo.title}
+                                    onClick={() => handleImageSelect(photo)}
+                                />
+                            </div>
+                        ))}
+                    </div>
+                    <Pagination />
                         <ReactModal
                             isOpen={selectedImage !== null}
                             onRequestClose={() => setSelectedImage(null)}
@@ -121,4 +117,3 @@ const HomePage = () => {
 };
 
 export default HomePage;
-

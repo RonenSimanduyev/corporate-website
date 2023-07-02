@@ -1,15 +1,17 @@
 import React from 'react';
 import ReactModal from 'react-modal';
-import {categories} from "@/constants";
+import { useSelector, useDispatch } from 'react-redux';
+import { categories } from '@/constants';
+import { setCategory } from '@/store/reducers/filtersSlice';
 
-export const TypeSelectionModal = ({ isOpen, onClose, setCategory ,toggleSortByDate ,sortByDate}) => {
-
+export const TypeSelectionModal = ({ isOpen, onClose, toggleSortByDate }) => {
+    const sortByDate = useSelector((state) => state.filters.sortByDate);
+    const dispatch = useDispatch();
 
     const handleCategorySelect = (type) => {
+        dispatch(setCategory(type));
         onClose();
-        setCategory(type);
     };
-
 
     const modalStyles = {
         overlay: {
@@ -26,11 +28,12 @@ export const TypeSelectionModal = ({ isOpen, onClose, setCategory ,toggleSortByD
             border: 'none', // Remove the border if needed
             borderRadius: '8px', // Adjust the border radius if needed
             boxShadow: '0 2px 4px rgba(0, 0, 0, 0.3)', // Add shadow if desired
-            background: '#ffffff', // Adjust the background color if needed
-        },
+            background: '#ffffff' // Adjust the background color if needed
+        }
     };
+
     return (
-        <ReactModal isOpen={isOpen} onRequestClose={onClose} contentLabel="Type Selection Modal"  style={modalStyles} >
+        <ReactModal isOpen={isOpen} onRequestClose={onClose} contentLabel="Type Selection Modal" style={modalStyles}>
             <div className="text-black">
                 <h2 className="m-4">Select Type</h2>
                 {categories.map((category) => (
@@ -38,12 +41,11 @@ export const TypeSelectionModal = ({ isOpen, onClose, setCategory ,toggleSortByD
                         {category}
                     </button>
                 ))}
-                <br/>
+                <br />
                 <label>
-                    <input type="checkbox" onClick={toggleSortByDate} checked={sortByDate}/>
-                        <span> sort by date</span>
+                    <input type="checkbox" onClick={toggleSortByDate} checked={sortByDate} />
+                    <span> sort by date</span>
                 </label>
-
             </div>
         </ReactModal>
     );
